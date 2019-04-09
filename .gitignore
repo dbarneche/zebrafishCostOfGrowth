@@ -1,0 +1,13 @@
+.remake/
+build.R
+remake.zip
+
+output/
+
+.DS_Store
+*.Rapp.history
+*.Rhistory
+*.RData
+*.rda
+*.rds
+*~$*

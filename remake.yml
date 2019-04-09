@@ -1,0 +1,136 @@
+packages:
+  - LoLinR
+  - rmarkdown
+  - plyr
+  - brms
+  - rstan
+  - rmarkdown
+
+sources:
+  - R/analyses.R
+  - R/figures.R
+  - R/tables.R
+
+targets:
+  all:
+    depends:
+      - output/figures/fig1.pdf
+      - output/figures/fig2.pdf
+      - output/figures/fig3.pdf
+      - output/figures/fig4.pdf
+      - output/figures/fig5.pdf
+      - output/figures/fig6.pdf
+      - output/figures/figS1a.pdf
+      - output/figures/figS1b.pdf
+      - output/figures/figS2a.pdf
+      - output/figures/figS2b.pdf
+      - output/figures/figS3.pdf
+      - output/tables/tableS1.csv
+      - output/tables/tableS2.csv
+      - output/tables/tableS3.csv
+      - output/tables/tableS4.csv
+
+  # Data -------------------------------------------------
+  rawData:
+    command: readFile('data/data.csv')
+
+  witroxFiles:
+    command: readAllWitroxes(I('data'), pattern = I('_witrox_'))
+    depends: rawData
+
+  cleanedWitroxFiles:
+    command: cleanWitroxFiles(witroxFiles)
+
+  respirationList:
+    command: makeRespirationList(cleanedWitroxFiles)
+
+  cleanedData:
+    command: cleanRawData(rawData)
+
+  respirationData:
+    command: makeRespirationData(respirationList, cleanedData)
+
+  mitochondrialRespirationData:
+    command: cleanMitochondriaData('data/mitoResp.csv', cleanedData, respModelBoltz, growthModel)
+
+  # Analyses ---------------------------------------------
+  growthModel:
+    command: putterGrowthModelBrms(cleanedData)
+
+  respModelBoltz:
+    command: boltzmannModelBrms(respirationData)
+
+  respModelSchool:
+    command: schoolfieldModelBrms(respirationData)
+
+  poRatioModel:
+    command: poRatioModelBrms(mitochondrialRespirationData)
+
+  emMitoRespModels:
+    command: runEmMitoRespModels(mitochondrialRespirationData)
+  
+  asympMassNo20Model:
+    command: runAsympMassNo20Model(cleanedData, growthModel)
+
+  # Tables -----------------------------------------------
+  tableS1:
+    command: makeTableS1(growthModel)
+
+  output/tables/tableS1.csv:
+    command: writeTables(target_name, tableS1)
+  
+  tableS2:
+    command: makeTableS2(respModelBoltz)
+
+  output/tables/tableS2.csv:
+    command: writeTables(target_name, tableS2)
+
+  tableS3:
+    command: makeTableS3(respModelSchool)
+
+  output/tables/tableS3.csv:
+    command: writeTables(target_name, tableS3)
+
+  tableS4:
+    command: makeTableS4(poRatioModel)
+
+  output/tables/tableS4.csv:
+    command: writeTables(target_name, tableS4)
+
+  # Figures ----------------------------------------------
+  output/figures/fig1.pdf:
+    command: makeFig1(dest = target_name, cleanedData, growthModel)
+
+  output/figures/fig2.pdf:
+    command: makeFig2(dest = target_name, cleanedData, growthModel, asympMassNo20Model)
+
+  output/figures/fig3.pdf:
+    command: makeFig3(dest = target_name, respirationData, respModelBoltz)
+
+  output/figures/fig4.pdf:
+    command: makeFig4(dest = target_name, mitochondrialRespirationData, poRatioModel)
+
+  output/figures/fig5.pdf:
+    command: makeFig5(dest = target_name, cleanedData, respModelBoltz, growthModel)
+
+  output/figures/fig6.pdf:
+    command: makeFig6(dest = target_name, mitochondrialRespirationData, emMitoRespModels)
+
+  output/figures/figS1a.pdf:
+    command: makeFigS1(dest = target_name, cleanedData, growthModel, I(c(20, 26)))
+
+  output/figures/figS1b.pdf:
+    command: makeFigS1(dest = target_name, cleanedData, growthModel, I(c(29, 32)))
+
+  output/figures/figS2a.pdf:
+    command: makeFigS2(dest = target_name, respirationData, respModelBoltz, I(c(20, 26)))
+
+  output/figures/figS2b.pdf:
+    command: makeFigS2(dest = target_name, respirationData, respModelBoltz, I(c(29, 32)))
+
+  output/figures/figS3.pdf:
+    command: makeFigS3(dest = target_name, respirationData, respModelSchool)
+
+  # Manuscript results -----------------------------------
+  knittedObjects:
+    command: docKnitObjectsForRmd(cleanedData, respirationData, mitochondrialRespirationData, growthModel, respModelBoltz, poRatioModel, respModelSchool)
