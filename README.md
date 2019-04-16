@@ -2,7 +2,7 @@
 
 This repository contains code and data needed to reproduce the article:
 
-**Barneche DR, Jahn M, Seebacher F**, Warming increases the cost of growth in a model vertebrate. *Functional Ecology* (accepted 07-Apr-2019).
+**Barneche DR, Jahn M, Seebacher F**, Warming increases the cost of growth in a model vertebrate. *Functional Ecology* (accepted 07-Apr-2019). [doi: 10.1111/1365-2435.13348](https://doi.org/10.1111/1365-2435.13348)  
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2634100.svg)](https://doi.org/10.5281/zenodo.2634100)
 
